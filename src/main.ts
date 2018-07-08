@@ -3,10 +3,23 @@ import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 
 import { AppModule } from './app/app.module';
 import { environment } from './environments/environment';
+import { hmrBootstrap } from './hmr';
 
 if (environment.production) {
-  enableProdMode();
+    enableProdMode();
 }
 
-platformBrowserDynamic().bootstrapModule(AppModule)
-  .catch(err => console.log(err));
+declare let module: any;
+
+const bootstrap = function () {
+    return platformBrowserDynamic().bootstrapModule(AppModule);
+};
+if (environment.hmr) {
+    if (module['hot']) {
+        hmrBootstrap(module, bootstrap);
+    } else {
+        console.error('HMR配置没有生效，启动失败！');
+    }
+} else {
+    bootstrap();
+}
